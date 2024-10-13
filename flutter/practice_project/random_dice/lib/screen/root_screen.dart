@@ -1,4 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:random_dice/screen/settings_screen.dart';
+import 'package:shake/shake.dart';
+
+import 'home_screen.dart';
 
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});
@@ -9,6 +15,9 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   TabController? controller;
+  double threshold = 2.7;
+  int number = 1;
+  ShakeDetector? shakeDetector;
 
   @override
   void initState() {
@@ -16,6 +25,20 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
     super.initState();
     controller = TabController(length: 2, vsync: this); // 컨트롤러 초기화 하기
     controller!.addListener(tabListener);
+
+    shakeDetector = ShakeDetector.autoStart(
+      shakeSlopTimeMS: 100,
+      shakeThresholdGravity: threshold,
+      onPhoneShake: onPhoneShake,
+    );
+  }
+
+  void onPhoneShake() {
+    final rand = new Random();
+
+    setState(() {
+      number = rand.nextInt(5) + 1;
+    });
   }
 
   tabListener() {
@@ -26,6 +49,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   void dispose() {
     // TODO: implement dispose
     controller!.removeListener(tabListener);
+    shakeDetector!.stopListening();
     super.dispose();
   }
 
@@ -42,27 +66,38 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
   List<Widget> renderChildren() {
     return [
-      Container(
-        child: Center(
-          child: Text(
-            'Tab 1',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-      Container(
-        child: Center(
-          child: Text(
-            'Tab 2',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
+      // Container(
+      //   child: Center(
+      //     child: Text(
+      //       'Tab 1',
+      //       style: TextStyle(
+      //         color: Colors.white,
+      //       ),ㄴㅋㅇㄴㄴ  ₩
+      //     ),
+      //   ),
+      // ),
+      HomeScreen(number: 1),
+      // Container(
+      //   child: Center(
+      //     child: Text(
+      //       'Tab 2',
+      //       style: TextStyle(
+      //         color: Colors.white,
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      SettingsScreen(
+        threshold: threshold,
+        onThresholdChange: onThresholdChange,
       ),
     ];
+  }
+
+  void onThresholdChange(double val) {
+    setState(() {
+      threshold = val;
+    });
   }
 
   BottomNavigationBar renderBottomNavigation() {

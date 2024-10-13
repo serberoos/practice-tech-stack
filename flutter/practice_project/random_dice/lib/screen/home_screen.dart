@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Center(
-          child: Image.asset(name),
+          child: Image.asset('asset/img/$number.png'),
         ),
         SizedBox(height: 32.0),
         Text(
